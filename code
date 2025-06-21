@@ -1,0 +1,62 @@
+from cryptography.fernet import Fernet
+import json
+import os
+
+# 1. Generate & Save Key (run once)
+def write_key():
+    key = Fernet.generate_key()
+    with open("secret.key", "wb") as key_file:
+        key_file.write(key)
+
+# 2. Load Encryption Key
+def load_key():
+    return open("secret.key", "rb").read()
+
+# 3. Add Password
+def add_password():
+    website = input("Website: ")
+    username = input("Username: ")
+    password = input("Password: ")
+
+    data = {
+        "website": website,
+        "username": username,
+        "password": fernet.encrypt(password.encode()).decode()
+    }
+
+    passwords.append(data)
+    with open("passwords.json", "w") as file:
+        json.dump(passwords, file, indent=4)
+
+    print("Password added successfully!")
+
+# 4. View Passwords
+def view_passwords():
+    for entry in passwords:
+        decrypted_pw = fernet.decrypt(entry['password'].encode()).decode()
+        print(f"Website: {entry['website']} | Username: {entry['username']} | Password: {decrypted_pw}")
+
+# Load existing data
+if os.path.exists("passwords.json"):
+    with open("passwords.json", "r") as file:
+        passwords = json.load(file)
+else:
+    passwords = []
+
+# Load/Create encryption key
+if not os.path.exists("secret.key"):
+    write_key()
+key = load_key()
+fernet = Fernet(key)
+
+# Main Program
+while True:
+    choice = input("\nChoose an option (add/view/exit): ").lower()
+    if choice == "add":
+        add_password()
+    elif choice == "view":
+        view_passwords()
+    elif choice == "exit":
+        break
+    else:
+        print("Invalid option.")
